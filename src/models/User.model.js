@@ -24,11 +24,11 @@ const UserSchema = new Schema({
         lowercase: true,
     },
 
-     Avatar: {
+     avatar: {
         type: String,
     },
 
-    CoverImage: {
+    coverImage: {
         type: String,
     },
 

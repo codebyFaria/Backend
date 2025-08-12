@@ -8,7 +8,7 @@ router.route('/register')
     .post(upload.fields(
         [
             {name:"avatar",maxCount:1},
-            {name:"coverPhoto",maxCount:1}
+            {name:"coverImage",maxCount:1}
         ]
     ), register);
 

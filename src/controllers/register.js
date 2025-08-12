@@ -3,6 +3,7 @@ import uploadCloudinary from '../utils/Cloudinary.js'
 import {User} from '../models/User.model.js'
 import ApiError from '../utils/ApiError.js';
 import ApiResponse from '../utils/ApiRespnse.js'
+import upload from '../middlewares/multer.middleware.js';
 
 const register = asyncHandler(async (req, res) => {
 
@@ -28,26 +29,29 @@ const register = asyncHandler(async (req, res) => {
       throw new ApiError(400, "All fields are required");  
   }
 
-const existUser = User.findOne({
+const existUser = await User.findOne({
     $or : [{userName},{email}]
   })
 
   if(existUser){
-    throw new ApiError(409,"User already exists" );
+    throw new ApiError(408,"User already exists" );
   }
 
  const avatarlocalPath =  req.files?.avatar[0].path;
- const coverPhotolocalPath =  req.files?.coverPhoto.path;
+ const coverImagelocalPath =  req.files?.coverImage[0].path;
+ console.log("Avatar Local Path:", avatarlocalPath);
+ console.log("Cover Image Local Path:", coverImagelocalPath);
 
  if(!avatarlocalPath){
     throw new ApiError(409," avatarlocalPath does not exist" );
  }
 
 const avatar = await uploadCloudinary(avatarlocalPath)
-const coverPhoto = await uploadCloudinary(coverPhotolocalPath)
+console.log("Avatar URL:", avatar?.url || "nothing in avatar");
+const coverImage = await uploadCloudinary(coverImagelocalPath)
 
 if(!avatar){
-  throw new ApiError(409," avatar does not exist" );
+  throw new ApiError(407," avatar does not exist" );
 }
 
 const user = await User.create({
@@ -55,15 +59,15 @@ const user = await User.create({
   email,
   userName, 
   Password,
-  Avatar:avatar.url,
-  CoverImage:coverPhoto?.url || ""
+  avatar:avatar.url,
+  coverImage:coverImage?.url || ""
 })
 
 const newUser = await User.findById(user._id).select(
   "-Password -refreshToken"
 )
 if(!newUser){
-  throw new ApiError(409,"User creation failed");
+  throw new ApiError(403,"User creation failed");
 }
 
 return res.status(200).json(
