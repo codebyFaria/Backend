@@ -3,6 +3,19 @@ import uploadCloudinary from '../utils/Cloudinary.js';
 import { User } from '../models/User.model.js';
 import ApiError from '../utils/ApiError.js';
 import ApiResponse from '../utils/ApiRespnse.js';
+import jwt from 'jsonwebtoken';
+
+  const generateAccessTokenAndRefreshToken = async (userId)=>{
+
+   const user = await User.findById(userId);
+   const accessToken = user.AccessGeneratorToken()
+   const refreshToken = user.RefreshTokenGenerator()
+
+   user.refreshToken = refreshToken;
+   await user.save({ validateBeforeSave: false });
+
+   return{accessToken,refreshToken};
+  }
 
 const register = asyncHandler(async (req, res) => {
   const { userName, email, FullName, Password } = req.body;
@@ -58,17 +71,7 @@ const register = asyncHandler(async (req, res) => {
 
 const Login = asyncHandler(async(req,res)=>{
 
-  const generateAccessTokenAndRefreshToken = async (userId)=>{
 
-   const user = await User.findById(userId);
-   const accessToken = user.AccessGeneratorToken()
-   const refreshToken = user.RefreshTokenGenerator()
-
-   user.refreshToken = refreshToken;
-   await user.save({ validateBeforeSave: false });
-
-   return{accessToken,refreshToken};
-  }
   const{email,userName,Password} = req.body;
 
   if(!(email || userName)){
@@ -83,16 +86,20 @@ const user = await User.findOne({
     throw new ApiError("Enter correct email or userName", 400)
   }
 
-const ValidPassword =  user.IsPasswordCorrect(Password);
+
+  console.log("Password from request:", req.body.Password);
+console.log("Hashed password from DB:", user.Password);
+
+const ValidPassword = await user.IsPasswordCorrect(Password);
 
 if(!ValidPassword){
   throw new ApiError("Password is Incorrect",401);
 }
 
-const{accessToken,refreshToken} =await generateAccessTokenAndRefreshToken(user._id);
+const{accessToken,refreshToken} = await generateAccessTokenAndRefreshToken(user._id);
 
 const logedInuser = await User.findById(user._id).select(
-  -Password -refreshToken
+  "-Password -refreshToken"
 );
 
 const options = {
@@ -140,7 +147,7 @@ return res
 })
 
 const refreshAccessToken = asyncHandler(async(req,res)=>{
- const incomingRefreshToken = req.cookie?.refreshToken || header.body.Authorization;
+ const incomingRefreshToken = req.cookies?.refreshToken || req.headers?.authorization?.split(" ")[1];
 
  if(!incomingRefreshToken){
   throw new ApiError("RefreshToken is not valid",401)
@@ -158,7 +165,7 @@ const refreshAccessToken = asyncHandler(async(req,res)=>{
     throw new ApiError("RefreshToken is not authorized",401)
   }
 
-  const{accessToken,newRefreshToken} = generateAccessTokenAndRefreshToken (user._id);
+  const{accessToken,newRefreshToken} = await generateAccessTokenAndRefreshToken (user._id);
 
   const options = {
     httpOnly:true,

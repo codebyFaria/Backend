@@ -55,13 +55,14 @@ const UserSchema = new Schema({
 UserSchema.pre("save", async function(next){
     if(!this.isModified("Password")) return;
 
-    this.Password = await bcrypt.hash(this.Password,10)
+    this.Password = await bcrypt.hash(this.password,10)
     next();
 })
 
-UserSchema.methods.IsPasswordCorrect = async function(password){
- return await bcrypt.compare(password,this.password);
-}
+UserSchema.methods.IsPasswordCorrect = async function(password) {
+  console.log("Comparing:", password, "with:", this.Password); 
+  return await bcrypt.compare(password, this.Password);
+};
 
 UserSchema.methods.AccessGeneratorToken = function(){
   return  jwt.sign(
