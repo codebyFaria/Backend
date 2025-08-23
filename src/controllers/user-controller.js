@@ -4,6 +4,7 @@ import { User } from '../models/User.model.js';
 import ApiError from '../utils/ApiError.js';
 import ApiResponse from '../utils/ApiRespnse.js';
 import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose'
 
 const generateAccessTokenAndRefreshToken = async (userId) => {
 
@@ -185,14 +186,15 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
 })
 
-const updatePassword = asyncHandler(async (res, req) => {
+const updatePassword = asyncHandler(async (req, res) => {
 
   // Take oldPassword,newPassword from fontend
   // Validate --empty
   // check the old password match with db
   // generate new Password
   // return response
-  console.log("REQ BODY:", req.body);
+ 
+console.log("TOKEN:", req.cookies?.accessToken, req.header("Authorization"));
   const { oldPassword, newPassword } = req.body;
 
 
@@ -211,7 +213,7 @@ const updatePassword = asyncHandler(async (res, req) => {
   const PasswordValidate = await user.IsPasswordCorrect(oldPassword);
 
   if (!PasswordValidate) {
-    throw new ApiError("Password is not correct", 400);
+    throw new ApiError("Password is not matching with old Password", 400);
   }
 
   user.Password = newPassword;
@@ -233,7 +235,7 @@ const forgetPassword = asyncHandler(async (req, res) => {
 
   const { email, setPassword, confirmPassword } = req.body;
 
-  const user = await User.find(email);
+  const user = await User.findOne({email});
 
   if (!user) {
     throw new ApiError("User is not found", 404)
@@ -242,17 +244,21 @@ const forgetPassword = asyncHandler(async (req, res) => {
   if (!(setPassword === confirmPassword)) return;
 
   user.Password = setPassword;
+  console.log("Password set");
   await user.save({ validateBeforeSave: false });
 
   return res.status(200).json(
-    new ApiResponse("Password updated successfully")
+    new ApiResponse("Password updated successfully",{user})
   )
 
 })
 
 const getCurrentUser = asyncHandler(async (req, res) => {
+
+   const user = await User.findById(req.user._id).select("-Password -refreshToken");
+
   return res.status(200).json
-    (new ApiResponse("User fetched successfully", req.user, 200));
+    (new ApiResponse("User fetched successfully", user, 200));
 });
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
@@ -281,6 +287,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 
 const updateAvatar = asyncHandler(async (req, res) => {
 
+  console.log("REQ FILE:", req.file);
   const avatarPath = req.file?.path;
 
   if (!avatarPath) {
@@ -315,6 +322,7 @@ const updateAvatar = asyncHandler(async (req, res) => {
 
 const updateCoverImage = asyncHandler(async (req, res) => {
 
+  console.log("REQ FILE:", req.file);
   const coverImagePath = req.file?.path;
 
   if (!coverImagePath) {
@@ -348,18 +356,19 @@ const updateCoverImage = asyncHandler(async (req, res) => {
 })
 
 const getUserProfile = asyncHandler(async (req, res) => {
+  const { userName } = req.params;
 
-  const userName = req.params;
+  // first check if user exists
+  const user = await User.findOne({ userName: userName });
 
-  if (!userName) {
-    throw new ApiError("User not found", 400)
+  if (!user) {
+    throw new ApiError(404, "User not found till end");
   }
 
+  // now run aggregation using user._id
   const channel = await User.aggregate([
     {
-      $match: {
-        userName: userName
-      }
+      $match: { _id: user._id }
     },
     {
       $lookup: {
@@ -379,20 +388,14 @@ const getUserProfile = asyncHandler(async (req, res) => {
     },
     {
       $addFields: {
-        totalSubscribers: {
-          $size: "$subscribers"
-        },
-        totalSubscribed: {
-          $size: "$subscribed"
-        }
-      }
-    },
-    {
-      isSubscribed: {
-        $cond: {
-          if: { $in: [req.user?._id, "$subscribers.Subscriber"] },
-          then: true,
-          else: false,
+        totalSubscribers: { $size: "$subscribers" },
+        totalSubscribed: { $size: "$subscribed" },
+        isSubscribed: {
+          $cond: {
+            if: { $in: [req.user?._id, "$subscribers.Subscriber"] },
+            then: true,
+            else: false
+          }
         }
       }
     },
@@ -403,21 +406,16 @@ const getUserProfile = asyncHandler(async (req, res) => {
         avatar: 1,
         coverImage: 1,
         email: 1,
-        isSubscribed: 1,
         totalSubscribers: 1,
-        totalSubscribed: 1
+        totalSubscribed: 1,
+        isSubscribed: 1
       }
     }
-  ])
+  ]);
 
-  if (!channel?.length) {
-    throw new ApiError("User not found", 404)
-  }
+  res.status(200).json(new ApiResponse(200, channel[0], "User profile fetched successfully"));
+});
 
-  return res.status(200).json(
-    new ApiResponse("User profile fetched successfully", channel[0], 200)
-  )
-})
 
 const getWatchHistory = asyncHandler(async (req, res) => {
 
