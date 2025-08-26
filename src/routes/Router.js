@@ -13,6 +13,8 @@ import {
     getUserProfile,
     getWatchHistory
 } from '../controllers/user-controller.js';
+import {publishAVideo,getVideoById,updateVideo,deleteVideo,togglePublishStatus,getAllVideos } from '../controllers/video-controller.js'
+import { addComment, updateComment, deleteComment, getVideoComments } from '../controllers/comment-controller.js'
 import upload from '../middlewares/multer.middleware.js'
 import { jwtVerify } from '../middlewares/jwtVerify.middleware.js'
 
@@ -44,5 +46,26 @@ router.route('/update-cover-image')
 
 router.route("/c/:userName").get(jwtVerify, getUserProfile);
 router.route("/get-watch-history").get(jwtVerify, getWatchHistory);
+
+router.route("/publish-video").post(jwtVerify, upload.fields(
+    [
+        { name: "video", maxCount: 1 },
+        { name: "thumbnail", maxCount: 1 }
+    ]
+), publishAVideo);
+
+router.route("/get-video/:videoId").get(jwtVerify, getVideoById);
+
+router.route ("/update/:videoId").patch(jwtVerify,upload.single("thumbnail"),updateVideo);
+router.route("/delete/:videoId").delete(jwtVerify,deleteVideo);
+router.route("/publish/:videoId").patch(jwtVerify,togglePublishStatus);
+
+router.route("/getAllvideos").get(jwtVerify,getAllVideos);
+router.route("/toggle/:videoId").patch(jwtVerify,togglePublishStatus);
+
+router.route("/add-comment/:videoId").post(jwtVerify, addComment);
+router.route("/update-comment/:commentId").patch(jwtVerify, updateComment);
+router.route("/delete-comment/:commentId").delete(jwtVerify, deleteComment);
+router.route("/get-video-comments/:videoId").get(jwtVerify, getVideoComments);
 
 export default router;

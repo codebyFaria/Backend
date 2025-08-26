@@ -5,7 +5,8 @@ const VideoSchema = new Schema({
     title: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        unique: true
     },
     description: {
         type: String,
@@ -35,7 +36,7 @@ const VideoSchema = new Schema({
     Owner: {
         type: Schema.Types.ObjectId,
         ref: "User",
-        required: true
+        // required: true
     }
 }, { timestamps: true });
 

@@ -7,6 +7,8 @@ const jwtVerify = asyncHandler(async (req,res,next)=>{
 
   const token = req.cookies?.accessToken || req.header("Authorization").replace("Bearer ", "");
 
+  
+
   if(!token){
     throw new ApiError("Token is not found",400)
   }
