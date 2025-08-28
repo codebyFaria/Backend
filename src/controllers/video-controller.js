@@ -104,7 +104,8 @@ const publishAVideo = asyncHandler(async (req, res) => {
             thumbnailUrl: thumbnailFile?.url,
             IsPublic: true,
             duration: VideoFile?.duration,
-            Owner: req.user._id
+            Owner: req.user._id,
+            views: 0
         }
     ) 
 
@@ -153,6 +154,27 @@ const publishAVideo = asyncHandler(async (req, res) => {
         new ApiResponse("Video is successfully published", 200, videoDetails[0])
     )
 
+})
+
+const views = asyncHandler(async (req, res) => {
+    const { videoId } = req.params
+
+    if(!isValidObjectId(videoId)){
+        throw new ApiError("Invalid video id",400)
+    }
+
+    const video = await Video.findById({_id: videoId})
+
+    if(!video){
+        throw new ApiError("Video not found",400)
+    }
+
+    video.views += 1
+    await video.save()
+
+    return res.status(200).json(
+        new ApiResponse("Video views incremented", 200, video)
+    )
 })
 
 const getVideoById = asyncHandler(async (req, res) => {
@@ -289,5 +311,6 @@ export {
     getVideoById,
     updateVideo,
     deleteVideo,
-    togglePublishStatus
+    togglePublishStatus,
+    views
 }

@@ -18,9 +18,13 @@ app.use(cookieParser());
 
 // Routes
 import userRouter from './routes/Router.js'
+
 app.use('/api/users', userRouter);
 app.use('/api/videos', userRouter);
 app.use('/api/comments', userRouter);
-
+app.use('/api/likes', userRouter);
+app.use('/api/playlists', userRouter);
+app.use('/api/subscriptions', userRouter);
+app.use('api/channelstate',userRouter)
 
 export default app;
