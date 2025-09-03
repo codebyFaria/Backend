@@ -22,7 +22,8 @@ import {
     updateVideo,
     deleteVideo,
     togglePublishStatus,
-    getAllVideos 
+    getAllVideos,
+    views
 }from '../controllers/video-controller.js'
 
 

@@ -1,17 +1,17 @@
 import mongoose from "mongoose"
 import {Video} from "../models/Video.model.js"
-import {Subscription} from "../models/Subscription.model.js"
+import {Subscription} from "../models/Subscription.mode.js"
 import {Like} from "../models/Like.model.js"
 import ApiError from "../utils/ApiError.js"
 import ApiResponse from "../utils/ApiRespnse.js"
-import asyncHandler from "../utils/asyncHanedler.js"
+import asyncHandler from "../utils/asyncHandeler.js"
 
 const getChannelStats = asyncHandler(async (req, res) => {
     // TODO: Get the channel stats like total video views, total subscribers, total videos, total likes etc.
-    const channelId = req.params.id;
+    const {channelId} = req.params;
 
     const totalViews = await Video.aggregate([
-        { $match: { channel: mongoose.Types.ObjectId(channelId) } },
+        { $match: { channel: new mongoose.Types.ObjectId(channelId) } },
         { $group: { _id: null, totalViews: { $sum: "$views" } } }
     ]);
 

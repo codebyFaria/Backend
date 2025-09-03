@@ -25,6 +25,6 @@ app.use('/api/comments', userRouter);
 app.use('/api/likes', userRouter);
 app.use('/api/playlists', userRouter);
 app.use('/api/subscriptions', userRouter);
-app.use('api/channelstate',userRouter)
+app.use('/api/channelstate', userRouter);
 
 export default app;
