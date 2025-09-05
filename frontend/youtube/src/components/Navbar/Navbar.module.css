@@ -1,0 +1,48 @@
+.Navbar{
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+    height: 40px;
+    justify-content: space-between;
+}
+
+.Navbar .logo{
+    width: 100px;
+    margin-left: 30px;
+}
+
+.Navbar .logo img{
+    width: 100%;
+}
+
+.Navbar .Searchbar{
+    display: flex;
+    width: 40%;
+    margin: 0 20px;
+}
+
+.Navbar .Searchbar input{
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #474646;
+    border-radius: 20px 0px 0px 20px;
+    background-color:black;
+    font-size: 16px;
+}
+
+.Navbar .Searchbar button{
+    padding: 13px 20px;
+    margin-left: 1px;
+    border: none;
+    border-radius: 0px 20px 20px 0px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #474646;
+    transition: background-color 0.3s;
+}
+
+.Navbar .navlinks{
+    margin-right: 20px;
+}
+

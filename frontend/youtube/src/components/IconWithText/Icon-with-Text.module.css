@@ -1,0 +1,27 @@
+.iconWithText {
+  display: flex;
+  align-items: center;
+  margin: 20px;
+  margin-left: 0px;
+}
+
+.iconWithText a{
+  padding: 8px 40px;
+  border-radius: 20px;
+}
+
+.active{
+  background-color:#474646
+}
+
+.iconWithText a:hover{
+  background-color:#474646
+}
+
+
+
+.icon {
+  margin-right: 30px;
+ font-size: 20px;
+}
+

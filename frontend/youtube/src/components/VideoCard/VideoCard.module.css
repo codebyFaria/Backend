@@ -1,0 +1,18 @@
+.videoCard {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  width: 20%;
+  background-color: black;
+}
+
+.videoCard img {
+  width: 100%;
+  height: auto;
+}
+
+.videoCard h3 {
+  font-size: 1.2em;
+  margin: 8px 0;
+}
