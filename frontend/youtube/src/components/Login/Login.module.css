@@ -1,0 +1,32 @@
+.loginContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+
+}
+
+.loginBox{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 35%;
+    height: 450px;
+    padding: 30px;
+    border-radius: 30px;
+    background-color:#474646;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.loginBox p{
+    color: white;
+    font-size: 18px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.loginBox p span{
+    color: #007bff;
+    cursor: pointer;
+    text-decoration: underline;
+}

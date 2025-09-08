@@ -1,0 +1,12 @@
+.homePage{
+    display: flex;
+    overflow: hidden;
+    margin-top: 20px;
+}
+.sidebar{
+    width: 20%;
+}
+.content{
+    width: 80%;
+    padding: 20px;
+}

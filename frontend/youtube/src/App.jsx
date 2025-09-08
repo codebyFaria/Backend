@@ -1,20 +1,29 @@
-import {Button} from './components/Button/Button'
-import { IconWithText } from './components/IconWithText/IconWithText';
-import { FaHome } from "react-icons/fa";
-import {Navbar} from './components/Navbar/Navbar'
-import Sidebar from './components/Sidebar/Sidebar'
-import { BrowserRouter } from 'react-router';
-import VideoCard from './components/VideoCard/VideoCard';
+import React from "react";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Home from "./page/Home/Home";
+import LoginPage from "./page/Login/Login";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Home />
+  },
+  {
+    path: "/login",
+    element: <LoginPage />
+  }
+]);
+
 
 function App() {
-
   return (
-    <BrowserRouter router='router'>
-      <Navbar />
-      <Sidebar />
-    </BrowserRouter>
-    
-  )
+    <>
+      <RouterProvider router={router} />
+     
+    </>
+  );
 }
 
-export default App
+
+
+export default App;
